@@ -79,13 +79,13 @@ func (ctx *Context) Readers() []string {
 
 // ServeFunc uses the provided HandlerFunc as a Handler
 func (ctx *Context) ServeFunc(hf HandlerFunc, targetReader ...string) error {
-	return ctx.Serve(hf)
+	return ctx.Serve(hf, targetReader...)
 }
 
 // Serve cards being swiped using the provided Handler
 func (ctx *Context) Serve(h Handler, targetReader ...string) error {
 	for {
-		ctx.serve(h)
+		ctx.serve(h, targetReader...)
 	}
 }
 
