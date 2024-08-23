@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/peterhellberg/acr122u"
+	"github.com/meko-christian/acr122u"
 )
 
 func main() {
