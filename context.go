@@ -78,35 +78,40 @@ func (ctx *Context) Readers() []string {
 }
 
 // ServeFunc uses the provided HandlerFunc as a Handler
-func (ctx *Context) ServeFunc(hf HandlerFunc) error {
+func (ctx *Context) ServeFunc(hf HandlerFunc, targetReader ...string) error {
 	return ctx.Serve(hf)
 }
 
 // Serve cards being swiped using the provided Handler
-func (ctx *Context) Serve(h Handler) error {
+func (ctx *Context) Serve(h Handler, targetReader ...string) error {
 	for {
 		ctx.serve(h)
 	}
 }
 
-func (ctx *Context) serve(h Handler) error {
-	reader, err := ctx.waitUntilCardPresent()
-	if err != nil {
-		return err
-	}
+func (ctx *Context) serve(h Handler, targetReader ...string) error {
+	for {
+		reader, err := ctx.waitUntilCardPresent(targetReader...)
+		if err != nil {
+			return err
+		}
 
-	c, err := ctx.connect(reader)
-	if err != nil {
-		return err
-	}
+		c, err := ctx.connect(reader)
+		if err != nil {
+			return err
+		}
 
-	if c.uid, err = c.getUID(); err == nil {
-		h.ServeCard(c)
-	} else {
-		return err
-	}
+		if c.uid, err = c.getUID(); err == nil {
+			h.ServeCard(c)
+		} else {
+			return err
+		}
 
-	return ctx.waitUntilCardRelease(reader)
+		err = ctx.waitUntilCardRelease(reader)
+		if err != nil {
+			return err
+		}
+	}
 }
 
 func (ctx *Context) connect(reader string) (*card, error) {
@@ -121,18 +126,27 @@ func (ctx *Context) connect(reader string) (*card, error) {
 	return newCard(reader, sc), nil
 }
 
-func (ctx *Context) waitUntilCardPresent() (string, error) {
-	rs := make([]scard.ReaderState, len(ctx.readers))
+func (ctx *Context) waitUntilCardPresent(targetReader ...string) (string, error) {
+	var readersToMonitor []string
+
+	// If a target reader is specified, use it; otherwise, monitor all readers
+	if len(targetReader) > 0 {
+		readersToMonitor = targetReader
+	} else {
+		readersToMonitor = ctx.readers
+	}
+
+	rs := make([]scard.ReaderState, len(readersToMonitor))
 
 	for i := range rs {
-		rs[i].Reader = ctx.readers[i]
+		rs[i].Reader = readersToMonitor[i]
 		rs[i].CurrentState = scard.StateUnaware
 	}
 
 	for {
 		for i := range rs {
 			if rs[i].EventState&scard.StatePresent != 0 {
-				return ctx.readers[i], nil
+				return readersToMonitor[i], nil
 			}
 
 			rs[i].CurrentState = rs[i].EventState

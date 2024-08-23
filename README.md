@@ -1,25 +1,61 @@
-# acr122u
+# acr122u (Forked)
 
 <img src="http://downloads.acs.com.hk/product-website-image/acr38-image.jpg" align="right" width="230" height="230">
 
-[![Build status](https://github.com/peterhellberg/acr122u/actions/workflows/test.yml/badge.svg?branch=master)](httpsgithub.com/peterhellberg/acr122u/actions/workflows/test.yml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/peterhellberg/acr122u)](https://goreportcard.com/report/github.com/peterhellberg/acr122u)
-[![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/peterhellberg/acr122u)
-[![License MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/peterhellberg/acr122u#license-mit)
+[![Build status](https://github.com/MeKo-Christian/acr122u/actions/workflows/test.yml/badge.svg?branch=master)](httpsgithub.com/MeKo-Christian/acr122u/actions/workflows/test.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/MeKo-Christian/acr122u)](https://goreportcard.com/report/github.com/MeKo-Christian/acr122u)
+[![GoDoc](https://img.shields.io/badge/godoc-reference-blue.svg?style=flat)](https://godoc.org/github.com/MeKo-Christian/acr122u)
+[![License MIT](https://img.shields.io/badge/license-MIT-lightgrey.svg?style=flat)](https://github.com/MeKo-Christian/acr122u#license-mit)
 
 This is a Go package for the ACR122U USB NFC Reader
 
+## About this fork
+
+This is a fork of the original [acr122u Go package](https://github.com/peterhellberg/acr122u) for the ACR122U USB NFC Reader. This fork includes additional functionality and improvements while maintaining the core features of the original package.
+
+### What'S new in this fork
+
+- The `ServeFunc` and `Serve` methods have been enhanced to optionally focus on a specific reader. This allows users to target a particular NFC reader if multiple readers are connected, making it easier to handle specific devices without interference from others.
+
+```go
+package main
+
+import (
+    "fmt"
+    "log"
+
+    "github.com/MeKo-Christian/acr122u"
+)
+
+func main() {
+    ctx, err := acr122u.EstablishContext()
+    if err != nil {
+        log.Fatalf("Failed to establish context: %v", err)
+    }
+
+    // Specify the reader you want to use
+    targetReader := "ACS ACR122U 00 00"
+
+    err = ctx.ServeFunc(func(c acr122u.Card) {
+        fmt.Printf("Card UID: %x\n", c.UID())
+    }, targetReader)
+    if err != nil {
+        log.Fatalf("Failed to serve: %v", err)
+    }
+}
+```
+
 ## Requirements
 
- - <https://www.acs.com.hk/en/products/3/acr122u-usb-nfc-reader/> - ACR122U USB NFC Reader
- - <https://pcsclite.apdu.fr/> - Middleware to access a smart card using SCard API (PC/SC)
- - <https://github.com/ebfe/scard> - Go bindings to the PC/SC API
+- <https://www.acs.com.hk/en/products/3/acr122u-usb-nfc-reader/> - ACR122U USB NFC Reader
+- <https://pcsclite.apdu.fr/> - Middleware to access a smart card using SCard API (PC/SC)
+- <https://github.com/ebfe/scard> - Go bindings to the PC/SC API
 
  Under macOS `pcsc-lite` can be installed using homebrew: `brew install pcsc-lite`
 
 ## Installation
 
-    go get -u github.com/peterhellberg/acr122u
+    go get -u github.com/MeKo-Christian/acr122u
 
 ## Usage
 
@@ -31,7 +67,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/peterhellberg/acr122u"
+	"github.com/MeKo-Christian/acr122u"
 )
 
 func main() {
@@ -55,7 +91,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/peterhellberg/acr122u"
+	"github.com/MeKo-Christian/acr122u"
 )
 
 func main() {
@@ -90,7 +126,7 @@ package main
 
 import (
 	nats "github.com/nats-io/go-nats"
-	acr122u "github.com/peterhellberg/acr122u"
+	acr122u "github.com/MeKo-Christian/acr122u"
 )
 
 func main() {
