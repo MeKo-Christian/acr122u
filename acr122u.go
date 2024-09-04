@@ -70,7 +70,7 @@ var (
 
 // Commands that can be transmitted to a *scard.Card
 var (
-	cmdGetUID = []byte{0xFF, 0xCA, 0x00, 0x00, 0x04}
+	cmdGetUID = []byte{0xFF, 0xCA, 0x00, 0x00, 0x07}
 )
 
 // Response codes
